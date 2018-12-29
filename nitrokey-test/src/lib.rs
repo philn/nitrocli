@@ -201,6 +201,24 @@ fn expand_serializer() -> Tokens {
   }
 }
 
+fn expand_connect(dev_type: Tokens, check: &Tokens) -> Tokens {
+  quote!{
+    {
+      use ::std::io::Write;
+      // Check if we can connect. Skip the test if we can't.
+      // TODO: There should be a better error code returned on the
+      //       `nitrokey` side of things.
+      let result = ::nitrokey::#dev_type::connect();
+      if let Err(::nitrokey::CommandError::Unknown) = result {
+        // TODO: Does not work with `Result` returns.
+        write!(::std::io::stdout(), "skipped: ");
+        return
+      }
+      result#check
+    }
+  }
+}
+
 /// Emit code for a wrapper function around a Nitrokey test function.
 fn expand_wrapper<S>(fn_name: S, device: EmittedDevice, wrappee: &syn::ItemFn) -> Tokens
 where
@@ -218,8 +236,8 @@ where
     syn::ReturnType::Type(_, type_) => (quote! {#type_}, quote! {?}),
   };
 
-  let connect_pro = quote! {::nitrokey::Pro::connect()#check};
-  let connect_storage = quote! {::nitrokey::Storage::connect()#check};
+  let connect_pro = expand_connect(quote! { Pro }, &check);
+  let connect_storage = expand_connect(quote! { Storage }, &check);
 
   let connect = match device {
     EmittedDevice::Pro => connect_pro,
