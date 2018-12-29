@@ -36,11 +36,11 @@ A command line tool for interacting with the Nitrokey Storage device.
 gitlab = { repository = "d-e-s-o/nitrocli", branch = "master" }
 
 [dependencies.argparse]
-version = "0.2.2"
+version = "0.2"
 path = "../argparse"
 
 [dependencies.nitrokey]
-version = "0.2.1"
+version = "0.2"
 path = "../nitrokey"
 
 
