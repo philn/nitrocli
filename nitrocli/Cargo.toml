@@ -43,9 +43,13 @@ path = "../argparse"
 version = "0.2"
 path = "../nitrokey"
 
+[dev-dependencies.nitrokey-test]
+version = "0.1"
+path = "../nitrokey-test"
 
 [replace]
 "cc:1.0.25" = { path = "../cc" }
 "libc:0.2.45" = { path = "../libc" }
+"nitrokey:0.2.1" = { path = "../nitrokey" }
 "nitrokey-sys:3.4.1" = { path = "../nitrokey-sys" }
 "rand:0.4.3" = { path = "../rand" }

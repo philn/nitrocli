@@ -454,6 +454,9 @@ pub fn otp_status(all: bool) -> Result<()> {
 mod tests {
   use super::*;
 
+  use nitrokey_test::test_device;
+
+
   #[test]
   fn prepare_secret_ascii() {
     let result = prepare_secret("12345678901234567890");
@@ -467,5 +470,18 @@ mod tests {
   fn prepare_secret_non_ascii() {
     let result = prepare_secret("Österreich");
     assert!(result.is_err());
+  }
+
+  #[test_device]
+  fn any_device_serial(device: nitrokey::DeviceWrapper) {
+    let serial = device.get_serial_number().unwrap();
+    assert_eq!(serial, "00002ff7")
+  }
+
+  #[test_device]
+  fn storage_serial_verbose(device: nitrokey::Storage) -> result::Result<(), nitrokey::CommandError> {
+    let serial = device.get_serial_number()?;
+    assert_eq!(serial, "00002ff7");
+    Ok(())
   }
 }
