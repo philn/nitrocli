@@ -1,8 +1,13 @@
+extern crate nitrokey;
+extern crate nitrokey_sys;
+
+mod util;
+
 use std::ffi::CStr;
 use std::process::Command;
 use std::{thread, time};
-use tests::util::{Target, ADMIN_PASSWORD, USER_PASSWORD};
-use {Authenticate, CommandError, Config, Device, Storage};
+use util::{Target, ADMIN_PASSWORD, USER_PASSWORD};
+use nitrokey::{Authenticate, CommandError, Config, Device, Storage};
 
 static ADMIN_NEW_PASSWORD: &str = "1234567890";
 static USER_NEW_PASSWORD: &str = "abcdefghij";
@@ -22,38 +27,38 @@ fn count_nitrokey_block_devices() -> usize {
 #[test]
 #[cfg_attr(not(feature = "test-no-device"), ignore)]
 fn connect_no_device() {
-    assert!(::connect().is_err());
-    assert!(::Pro::connect().is_err());
-    assert!(::Storage::connect().is_err());
+    assert!(nitrokey::connect().is_err());
+    assert!(nitrokey::Pro::connect().is_err());
+    assert!(nitrokey::Storage::connect().is_err());
 }
 
 #[test]
 #[cfg_attr(not(feature = "test-pro"), ignore)]
 fn connect_pro() {
-    assert!(::connect().is_ok());
-    assert!(::Pro::connect().is_ok());
-    assert!(::Storage::connect().is_err());
-    match ::connect().unwrap() {
-        ::DeviceWrapper::Pro(_) => assert!(true),
-        ::DeviceWrapper::Storage(_) => assert!(false),
+    assert!(nitrokey::connect().is_ok());
+    assert!(nitrokey::Pro::connect().is_ok());
+    assert!(nitrokey::Storage::connect().is_err());
+    match nitrokey::connect().unwrap() {
+        nitrokey::DeviceWrapper::Pro(_) => assert!(true),
+        nitrokey::DeviceWrapper::Storage(_) => assert!(false),
     };
 }
 
 #[test]
 #[cfg_attr(not(feature = "test-storage"), ignore)]
 fn connect_storage() {
-    assert!(::connect().is_ok());
-    assert!(::Pro::connect().is_err());
-    assert!(::Storage::connect().is_ok());
-    match ::connect().unwrap() {
-        ::DeviceWrapper::Pro(_) => assert!(false),
-        ::DeviceWrapper::Storage(_) => assert!(true),
+    assert!(nitrokey::connect().is_ok());
+    assert!(nitrokey::Pro::connect().is_err());
+    assert!(nitrokey::Storage::connect().is_ok());
+    match nitrokey::connect().unwrap() {
+        nitrokey::DeviceWrapper::Pro(_) => assert!(false),
+        nitrokey::DeviceWrapper::Storage(_) => assert!(true),
     };
 }
 
 fn assert_empty_serial_number() {
     unsafe {
-        let ptr = ::nitrokey_sys::NK_device_serial_number();
+        let ptr = nitrokey_sys::NK_device_serial_number();
         assert!(!ptr.is_null());
         let cstr = CStr::from_ptr(ptr);
         assert_eq!(cstr.to_string_lossy(), "");
