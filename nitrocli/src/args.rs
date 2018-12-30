@@ -24,12 +24,14 @@ use std::str;
 
 use crate::commands;
 use crate::error::Error;
+use crate::pinentry;
 
 type Result<T> = result::Result<T, Error>;
 
 /// A top-level command for nitrocli.
 #[derive(Debug)]
 pub enum Command {
+  ChangePin,
   Clear,
   Config,
   Lock,
@@ -44,6 +46,7 @@ impl Command {
   /// Execute this command with the given arguments.
   pub fn execute(&self, args: Vec<String>) -> Result<()> {
     match *self {
+      Command::ChangePin => change_pin(args),
       Command::Clear => clear(args),
       Command::Config => config(args),
       Command::Lock => lock(args),
@@ -62,6 +65,7 @@ impl fmt::Display for Command {
       f,
       "{}",
       match *self {
+        Command::ChangePin => "change-pin",
         Command::Clear => "clear",
         Command::Config => "config",
         Command::Lock => "lock",
@@ -80,6 +84,7 @@ impl str::FromStr for Command {
 
   fn from_str(s: &str) -> result::Result<Self, Self::Err> {
     match s {
+      "change-pin" => Ok(Command::ChangePin),
       "clear" => Ok(Command::Clear),
       "config" => Ok(Command::Config),
       "lock" => Ok(Command::Lock),
@@ -454,6 +459,22 @@ fn clear(args: Vec<String>) -> Result<()> {
   parse(&parser, args)?;
 
   commands::clear()
+}
+
+/// Change a PIN.
+fn change_pin(args: Vec<String>) -> Result<()> {
+  let mut pintype = pinentry::PinType::User;
+  let mut parser = argparse::ArgumentParser::new();
+  parser.set_description("Changes a PIN");
+  let _ = parser.refer(&mut pintype).required().add_argument(
+    "type",
+    argparse::Store,
+    "The PIN type to change (admin|user)",
+  );
+  parse(&parser, args)?;
+  drop(parser);
+
+  commands::change_pin(pintype)
 }
 
 /// Unblock and reset the user PIN.
@@ -865,7 +886,7 @@ fn parse_arguments(args: Vec<String>) -> Result<(Command, Vec<String>)> {
   let _ = parser.refer(&mut command).required().add_argument(
     "command",
     argparse::Store,
-    "The command to execute (clear|config|otp|status|storage|unblock-pin)",
+    "The command to execute (change-pin|clear|config|otp|status|storage|unblock-pin)",
   );
   let _ = parser.refer(&mut subargs).add_argument(
     "arguments",

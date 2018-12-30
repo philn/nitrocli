@@ -13,6 +13,7 @@ certain commands on the [Nitrokey Storage][nitrokey-storage] device.
 The following commands are currently supported:
 - status: Report status information about the Nitrokey.
 - clear: Remove the user and admin PIN from gpg-agent's cache.
+- change-pin: Change the admin or the user PIN.
 - unblock-pin: Unblock and reset the user PIN.
 - storage: Work with the Nitrokey's storage.
   - open: Open the encrypted volume. The user PIN needs to be entered.
