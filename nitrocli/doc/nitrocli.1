@@ -18,6 +18,13 @@ number, the firmware version, and the PIN retry count.
 .TP
 .B nitrocli clear
 Clear the passphrases cached by the other commands.
+.TP
+.B nitrocli unblock-pin
+Unblock and reset the user PIN.
+This command requires the admin PIN.
+The admin PIN cannot be unblocked.
+This operation is equivalent to the unblock PIN option provided by \fBgpg\fR(1)
+(using the \fB--change-pin\fR option).
 
 .SS Storage
 .TP

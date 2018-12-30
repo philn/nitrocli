@@ -37,6 +37,7 @@ pub enum Command {
   Pws,
   Status,
   Storage,
+  UnblockPin,
 }
 
 impl Command {
@@ -50,6 +51,7 @@ impl Command {
       Command::Pws => pws(args),
       Command::Status => status(args),
       Command::Storage => storage(args),
+      Command::UnblockPin => unblock_pin(args),
     }
   }
 }
@@ -67,6 +69,7 @@ impl fmt::Display for Command {
         Command::Pws => "pws",
         Command::Status => "status",
         Command::Storage => "storage",
+        Command::UnblockPin => "unblock-pin",
       }
     )
   }
@@ -84,6 +87,7 @@ impl str::FromStr for Command {
       "pws" => Ok(Command::Pws),
       "status" => Ok(Command::Status),
       "storage" => Ok(Command::Storage),
+      "unblock-pin" => Ok(Command::UnblockPin),
       _ => Err(()),
     }
   }
@@ -450,6 +454,15 @@ fn clear(args: Vec<String>) -> Result<()> {
   parse(&parser, args)?;
 
   commands::clear()
+}
+
+/// Unblock and reset the user PIN.
+fn unblock_pin(args: Vec<String>) -> Result<()> {
+  let mut parser = argparse::ArgumentParser::new();
+  parser.set_description("Unblocks and resets the user PIN");
+  parse(&parser, args)?;
+
+  commands::unblock_pin()
 }
 
 /// Execute a config subcommand.
@@ -852,7 +865,7 @@ fn parse_arguments(args: Vec<String>) -> Result<(Command, Vec<String>)> {
   let _ = parser.refer(&mut command).required().add_argument(
     "command",
     argparse::Store,
-    "The command to execute (clear|config|otp|status|storage)",
+    "The command to execute (clear|config|otp|status|storage|unblock-pin)",
   );
   let _ = parser.refer(&mut subargs).add_argument(
     "arguments",
